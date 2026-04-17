@@ -1,0 +1,85 @@
+name: Deploy playground to GitHub Pages
+
+# Publishes dist-site/ to GitHub Pages. Runs on every push to main and also
+# when a `v*` tag is pushed (so the published release and the live playground
+# stay in sync). Trigger manually via workflow_dispatch if you just want to
+# redeploy without pushing anything.
+#
+# Setup (one-time):
+#   Settings → Pages → Source → "GitHub Actions"
+#
+# sampo-config consumes sampo-editor through file:../sampo-editor, so we
+# check out both repositories side by side.
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sampo-config
+        uses: actions/checkout@v4
+        with:
+          path: sampo-config
+
+      - name: Checkout sampo-editor (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: uji69i/sampo-editor
+          path: sampo-editor
+          ref: main
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: |
+            sampo-config/pnpm-lock.yaml
+            sampo-editor/pnpm-lock.yaml
+
+      - name: Build sampo-editor (sibling)
+        working-directory: sampo-editor
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Install sampo-config deps
+        working-directory: sampo-config
+        run: pnpm install --frozen-lockfile
+
+      - name: Build site
+        working-directory: sampo-config
+        run: pnpm build:site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sampo-config/dist-site
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

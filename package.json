@@ -1,0 +1,115 @@
+{
+  "name": "sampo-config",
+  "version": "0.0.1-alpha.1",
+  "description": "Embeddable Mihomo/Clash config generator for React + Vite + Tailwind v4 apps. Powered by sampo-editor.",
+  "type": "module",
+  "main": "./dist/sampo-config.js",
+  "module": "./dist/sampo-config.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/sampo-config.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "dev": "vite --mode dev",
+    "build": "vite build",
+    "build:site": "vite build --mode site",
+    "build:single": "vite build --mode single",
+    "build:all": "pnpm build && pnpm build:site && pnpm build:single",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "preview": "vite preview --mode dev",
+    "preview:site": "vite preview --mode site --outDir dist-site",
+    "preflight": "pnpm typecheck && pnpm test && pnpm build",
+    "prepublishOnly": "pnpm preflight"
+  },
+  "keywords": [
+    "mihomo",
+    "clash",
+    "config",
+    "generator",
+    "yaml",
+    "react",
+    "tailwind",
+    "vite"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "uji69i",
+    "url": "https://github.com/uji69i"
+  },
+  "contributors": [
+    {
+      "name": "Claude Opus 4.6",
+      "url": "https://www.anthropic.com/claude"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uji69i/sampo-config.git"
+  },
+  "homepage": "https://github.com/uji69i/sampo-config#readme",
+  "bugs": {
+    "url": "https://github.com/uji69i/sampo-config/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "sampo-editor": "^0.0.1-alpha.1"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
+    "lucide-react": "^0.575.0",
+    "pako": "^2.1.0",
+    "radix-ui": "^1.4.3",
+    "tailwind-merge": "^3.5.0",
+    "yaml": "^2.8.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.0",
+    "@types/node": "^24.10.1",
+    "@types/pako": "^2.0.4",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.0",
+    "sampo-editor": "file:../sampo-editor",
+    "tailwindcss": "^4.2.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.3",
+    "vite-plugin-singlefile": "^2.3.2",
+    "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

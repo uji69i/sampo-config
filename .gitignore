@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-site
+dist-single
+dist-static
+dev-dist
+coverage
+.wrangler
+.DS_Store
+*.tsbuildinfo

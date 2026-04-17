@@ -1,0 +1,78 @@
+name: CI
+
+# Runs on every push and pull request to main/master. This is the "is the
+# tree healthy?" check — typecheck + tests + full library build.
+#
+# sampo-config consumes sampo-editor through a file:../sampo-editor link, so
+# we check out both repositories side by side before running `pnpm install`.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: typecheck + test + build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sampo-config
+        uses: actions/checkout@v4
+        with:
+          path: sampo-config
+
+      - name: Checkout sampo-editor (sibling)
+        uses: actions/checkout@v4
+        with:
+          repository: uji69i/sampo-editor
+          path: sampo-editor
+          ref: main
+
+      - uses: pnpm/action-setup@v4
+        # Version is read from the `packageManager` field in package.json.
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: |
+            sampo-config/pnpm-lock.yaml
+            sampo-editor/pnpm-lock.yaml
+
+      - name: Build sampo-editor (sibling)
+        working-directory: sampo-editor
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Install sampo-config deps
+        working-directory: sampo-config
+        run: pnpm install --frozen-lockfile
+
+      - name: Preflight (typecheck + test + build)
+        working-directory: sampo-config
+        run: pnpm preflight
+
+      - name: Build site artifact
+        working-directory: sampo-config
+        run: pnpm build:site
+
+      - name: Build single-file artifact
+        working-directory: sampo-config
+        run: pnpm build:single
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-site
+          path: sampo-config/dist-site/
+          retention-days: 14
+
+      - name: Upload single-file artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-single
+          path: sampo-config/dist-single/
+          retention-days: 14

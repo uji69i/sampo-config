@@ -1,0 +1,6 @@
+name = "sampo-config"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "./dist-site"
+not_found_handling = "single-page-application"

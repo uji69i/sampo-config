@@ -1,0 +1,104 @@
+# GitLab CI mirror of .github/workflows/. Kept as a safety net in case
+# GitHub Actions is unavailable.
+#
+# Pipeline stages:
+#   test    — typecheck + tests + full library build on every push/MR
+#   build   — produces dist-site and dist-single as job artifacts
+#   pages   — deploys dist-site/ to GitLab Pages (only on default branch)
+#   publish — publishes to npm on tag push (v*)
+#
+# sampo-config consumes sampo-editor through file:../sampo-editor, so every
+# job clones uji69i/sampo-editor as a sibling and runs its `pnpm build`
+# before sampo-config's install.
+#
+# Required CI/CD variables (Settings → CI/CD → Variables):
+#   NPM_TOKEN — npm automation token with publish rights to sampo-config.
+#               Mark it protected + masked.
+#   SAMPO_EDITOR_REPO_URL — optional override of the clone URL for
+#               sampo-editor. Defaults to the public https mirror.
+
+default:
+  image: node:20
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+
+variables:
+  SAMPO_EDITOR_REPO_URL: "https://github.com/uji69i/sampo-editor.git"
+  SAMPO_EDITOR_REF: "main"
+
+stages:
+  - test
+  - build
+  - pages
+  - publish
+
+.pnpm_setup: &pnpm_setup
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@10.33.0 --activate
+    - pnpm config set store-dir .pnpm-store
+    # Check out sampo-editor into a sibling path so file:../sampo-editor resolves.
+    - git clone --depth 1 --branch "${SAMPO_EDITOR_REF}" "${SAMPO_EDITOR_URL:-$SAMPO_EDITOR_REPO_URL}" ../sampo-editor
+    - (cd ../sampo-editor && pnpm install --frozen-lockfile && pnpm build)
+    - pnpm install --frozen-lockfile
+
+test:
+  stage: test
+  <<: *pnpm_setup
+  script:
+    - pnpm preflight
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+build:artifacts:
+  stage: build
+  <<: *pnpm_setup
+  script:
+    - pnpm build:site
+    - pnpm build:single
+  artifacts:
+    paths:
+      - dist-site/
+      - dist-single/
+    expire_in: 2 weeks
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+# GitLab Pages expects the final static tree at `public/`. We build to
+# dist-site/ via the regular vite config and rename for the deploy job.
+pages:
+  stage: pages
+  <<: *pnpm_setup
+  script:
+    - pnpm build:site
+    - rm -rf public
+    - mv dist-site public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+publish:npm:
+  stage: publish
+  <<: *pnpm_setup
+  script:
+    - |
+      TAG_VERSION="${CI_COMMIT_TAG#v}"
+      PKG_VERSION=$(node -p "require('./package.json').version")
+      if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+        echo "Tag $CI_COMMIT_TAG does not match package.json version $PKG_VERSION"
+        exit 1
+      fi
+    - pnpm preflight
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - pnpm publish --no-git-checks --access public
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
