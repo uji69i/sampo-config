@@ -1,4 +1,7 @@
 # sampo-config
+[![npm (alpha)](https://img.shields.io/npm/v/sampo-config/alpha)](https://www.npmjs.com/package/sampo-config)
+[![status: alpha](https://img.shields.io/badge/status-alpha-orange)](#installation)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
 Embeddable Mihomo/Clash config generator for React + Vite + Tailwind v4 apps.
 
