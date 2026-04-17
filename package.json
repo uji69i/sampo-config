@@ -1,6 +1,6 @@
 {
   "name": "sampo-config",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.2-alpha.1",
   "description": "Embeddable Mihomo/Clash config generator for React + Vite + Tailwind v4 apps. Powered by sampo-editor.",
   "type": "module",
   "main": "./dist/sampo-config.js",

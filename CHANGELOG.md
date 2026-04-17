@@ -4,7 +4,26 @@ All notable changes to `sampo-config` will be documented here.
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 the project uses [Semantic Versioning](https://semver.org/).
 
-## [0.0.1] — 2026-04-12
+## [0.0.2-alpha.1] — 2026-04-17
+
+### Changed
+
+- **Manual YAML edit mode** — Monaco editor is now `readOnly` by default;
+  "Edit manually" button unlocks it, with explicit Apply/Cancel flow and a
+  confirm dialog when form controls change state while editing. Removes the
+  old debounced auto-dispatch that caused ~500ms "revert-on-typing".
+- **sampo-editor installed from npm** instead of `file:../sampo-editor`.
+  CI workflows and Cloudflare Pages no longer need a sibling checkout.
+- Simplified all CI/CD workflows (GitHub Actions, GitLab CI).
+
+### Added
+
+- Cloudflare Pages deployment (`wrangler.toml`).
+- `build:site`, `build:single`, `build:all` scripts.
+- GitHub Pages deployment workflow (`deploy-pages.yml`).
+- i18n keys for manual edit mode in `en`, `ru`, `fa` locales.
+
+## [0.0.1-alpha.1] — 2026-04-12
 
 First public release. Consider everything here experimental — APIs may still
 shift a bit before `0.1.0`.

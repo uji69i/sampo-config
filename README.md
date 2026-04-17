@@ -5,13 +5,15 @@
 
 Embeddable Mihomo/Clash config generator for React + Vite + Tailwind v4 apps.
 
+**Live demo:** <https://sampo-config.uji69i.workers.dev/>
+
 Drop `<MihomoConfigGenerator />` into your app, wrap it in `I18nProvider` + a
 router, bring Tailwind v4 with the provided theme, and the full UI of the
 generator becomes available.
 
 All mihomo-specific knowledge — the form-meta catalogue, the JSON Schema used
 for YAML validation, and the Monaco editor itself — lives in
-[`sampo-editor`](../sampo-editor), which `sampo-config` consumes as a peer
+[`sampo-editor`](https://github.com/uji69i/sampo-editor), which `sampo-config` consumes as a peer
 dependency. Edit form-meta YAML once, get both the generator UI and the Monaco
 editor hints updated.
 
