@@ -16,11 +16,6 @@ requests, issues, translations and bug reports are all welcome.
 ## Quick start
 
 ```bash
-# First, build sampo-editor (this package consumes it via file:../sampo-editor)
-cd ../sampo-editor && pnpm install && pnpm build
-
-# Then, back here:
-cd ../sampo-config
 pnpm install
 pnpm dev            # playground at http://localhost:5173
 pnpm build          # library build → dist/

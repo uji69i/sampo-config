@@ -1,21 +1,7 @@
-# GitLab CI mirror of .github/workflows/. Kept as a safety net in case
-# GitHub Actions is unavailable.
-#
-# Pipeline stages:
-#   test    — typecheck + tests + full library build on every push/MR
-#   build   — produces dist-site and dist-single as job artifacts
-#   pages   — deploys dist-site/ to GitLab Pages (only on default branch)
-#   publish — publishes to npm on tag push (v*)
-#
-# sampo-config consumes sampo-editor through file:../sampo-editor, so every
-# job clones uji69i/sampo-editor as a sibling and runs its `pnpm build`
-# before sampo-config's install.
+# GitLab CI mirror of .github/workflows/.
 #
 # Required CI/CD variables (Settings → CI/CD → Variables):
-#   NPM_TOKEN — npm automation token with publish rights to sampo-config.
-#               Mark it protected + masked.
-#   SAMPO_EDITOR_REPO_URL — optional override of the clone URL for
-#               sampo-editor. Defaults to the public https mirror.
+#   NPM_TOKEN — npm automation token. Mark it protected + masked.
 
 default:
   image: node:20
@@ -25,10 +11,6 @@ default:
         - pnpm-lock.yaml
     paths:
       - .pnpm-store
-
-variables:
-  SAMPO_EDITOR_REPO_URL: "https://github.com/uji69i/sampo-editor.git"
-  SAMPO_EDITOR_REF: "main"
 
 stages:
   - test
@@ -41,9 +23,6 @@ stages:
     - corepack enable
     - corepack prepare pnpm@10.33.0 --activate
     - pnpm config set store-dir .pnpm-store
-    # Check out sampo-editor into a sibling path so file:../sampo-editor resolves.
-    - git clone --depth 1 --branch "${SAMPO_EDITOR_REF}" "${SAMPO_EDITOR_URL:-$SAMPO_EDITOR_REPO_URL}" ../sampo-editor
-    - (cd ../sampo-editor && pnpm install --frozen-lockfile && pnpm build)
     - pnpm install --frozen-lockfile
 
 test:
@@ -71,8 +50,6 @@ build:artifacts:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
-# GitLab Pages expects the final static tree at `public/`. We build to
-# dist-site/ via the regular vite config and rename for the deploy job.
 pages:
   stage: pages
   <<: *pnpm_setup

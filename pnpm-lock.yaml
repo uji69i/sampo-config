@@ -82,8 +82,8 @@ importers:
         specifier: ^7.13.0
         version: 7.14.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       sampo-editor:
-        specifier: file:../sampo-editor
-        version: file:../sampo-editor(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^0.0.1-alpha.1
+        version: 0.0.1-alpha.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       tailwindcss:
         specifier: ^4.2.0
         version: 4.2.2
@@ -2082,8 +2082,8 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
-  sampo-editor@file:../sampo-editor:
-    resolution: {directory: ../sampo-editor, type: directory}
+  sampo-editor@0.0.1-alpha.1:
+    resolution: {integrity: sha512-UXnRa9l+gvALheOIG/rtAV0aEMWaUDLFzXfUWQuEcn07yG9Xb7qhe8Gr616Ko9zXCmvIiJZDT2iWgByM7EInjg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^19.0.0
@@ -4346,7 +4346,7 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.60.1
       fsevents: 2.3.3
 
-  sampo-editor@file:../sampo-editor(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  sampo-editor@0.0.1-alpha.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       '@monaco-editor/react': 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       class-variance-authority: 0.7.1

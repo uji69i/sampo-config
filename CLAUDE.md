@@ -234,14 +234,12 @@ Single-file caveat: Monaco workers arrive pre-compiled inside `sampo-editor/dist
 
 ## Gotchas
 
-- **`sampo-editor` in `devDependencies` is `file:../sampo-editor`.** This
-  relies on a sibling checkout at `../sampo-editor`. CI workflows (both
-  GitHub Actions and GitLab CI) check out `uji69i/sampo-editor` into a
-  sibling directory before running `pnpm install`. If you clone only
-  sampo-config, you also need sampo-editor next to it on disk (and its
-  `dist/` must exist — the file-link consumes the published-style `dist`
-  output). Run `pnpm build` inside sampo-editor first.
-- **`peerDependencies.sampo-editor` is `^0.0.1`.** Keep this in lockstep
+- **`sampo-editor` is installed from npm** (same version in both
+  `peerDependencies` and `devDependencies`). For local development with a
+  sibling checkout, use `pnpm link ../sampo-editor` to replace the npm
+  copy with a symlink to your local build — no `package.json` change
+  required. Run `pnpm install` to revert to the npm version.
+- **`peerDependencies.sampo-editor` is `^0.0.1-alpha.1`.** Keep this in lockstep
   with the sampo-editor version we are developing against. Bump both when
   sampo-editor publishes a breaking change.
 - **`vite-plugin-dts` uses `tsconfig.build.json` (stricter, src-only)** —

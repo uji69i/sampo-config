@@ -150,10 +150,9 @@ pnpm build:all     # all three above in sequence
 pnpm preflight     # typecheck + test + build (what CI runs)
 ```
 
-`sampo-editor` is linked locally via `file:../sampo-editor` in
-`devDependencies`. Build `sampo-editor` first (its `dist/` must exist) before
-running `sampo-config`'s dev server or build — the playground and library
-consume `sampo-editor/dist` directly.
+`sampo-editor` is installed from npm. For local development against a sibling
+checkout, use `pnpm link ../sampo-editor` after `pnpm install` — this replaces
+the npm copy with a symlink to your local build. Run `pnpm install` to revert.
 
 The `dev/` directory hosts a minimal playground that imports the library via
 the `@/` alias (the same way a consumer would import from `sampo-config`).
@@ -163,8 +162,7 @@ the `@/` alias (the same way a consumer would import from `sampo-config`).
 Form-meta YAML lives in `sampo-editor/form-meta/`. After editing anything
 there, run `pnpm build:presets` (or `pnpm build`) inside `sampo-editor` to
 regenerate `presets/mihomo/generated/*`. sampo-config picks up the changes
-through the `file:../sampo-editor` link on the next dev server restart or
-build.
+via `pnpm link` on the next dev server restart or build.
 
 The hand-maintained TypeScript interfaces for the mihomo runtime config shape
 live at `src/lib/mihomo/generated/config-types.ts` and are treated as a

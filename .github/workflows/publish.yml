@@ -1,24 +1,5 @@
 name: Publish to npm
 
-# Runs when you push a tag matching `v*` (e.g. `v0.0.1`). Builds the library,
-# publishes to npm, and creates a GitHub Release with generated notes.
-#
-# Setup (one-time):
-#   1. Create an npm automation token: https://docs.npmjs.com/creating-and-viewing-access-tokens
-#   2. Add it as a repository secret named NPM_TOKEN
-#      (Settings → Secrets and variables → Actions → New repository secret)
-#
-# Usage:
-#   git tag v0.0.1
-#   git push origin v0.0.1
-#
-# The workflow refuses to publish if the tag does not match the `version`
-# field in package.json, so you cannot accidentally push a mismatch.
-#
-# sampo-editor is a peer dependency; CI still checks out sampo-editor into a
-# sibling directory so the local file:../sampo-editor devDependency resolves
-# during install and preflight.
-
 on:
   push:
     tags: ['v*']
@@ -37,17 +18,7 @@ jobs:
     name: publish ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout sampo-config
-        uses: actions/checkout@v4
-        with:
-          path: sampo-config
-
-      - name: Checkout sampo-editor (sibling)
-        uses: actions/checkout@v4
-        with:
-          repository: uji69i/sampo-editor
-          path: sampo-editor
-          ref: main
+      - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
 
@@ -55,24 +26,13 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-          cache-dependency-path: |
-            sampo-config/pnpm-lock.yaml
-            sampo-editor/pnpm-lock.yaml
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Build sampo-editor (sibling)
-        working-directory: sampo-editor
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm build
-
-      - name: Install sampo-config deps
-        working-directory: sampo-config
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Verify tag matches package.json version
         if: startsWith(github.ref, 'refs/tags/v')
-        working-directory: sampo-config
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           PKG_VERSION=$(node -p "require('./package.json').version")
@@ -83,25 +43,21 @@ jobs:
           echo "Publishing sampo-config@$PKG_VERSION"
 
       - name: Preflight (typecheck + test + build)
-        working-directory: sampo-config
         run: pnpm preflight
 
       - name: Build site + single-file artifacts
-        working-directory: sampo-config
         run: |
           pnpm build:site
           pnpm build:single
 
       - name: Publish to npm
         if: github.event.inputs.dry_run != 'true'
-        working-directory: sampo-config
         run: pnpm publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Dry-run publish
         if: github.event.inputs.dry_run == 'true'
-        working-directory: sampo-config
         run: pnpm publish --dry-run --no-git-checks --access public
 
       - name: Create GitHub Release
@@ -111,4 +67,4 @@ jobs:
           name: sampo-config ${{ github.ref_name }}
           generate_release_notes: true
           files: |
-            sampo-config/dist-single/index.html
+            dist-single/index.html
