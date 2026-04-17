@@ -33,6 +33,28 @@ export default defineConfig(({ command, mode }) => {
       react(),
       tailwindcss(),
       ...(isSingleBuild ? [viteSingleFile({ removeViteModuleLoader: true })] : []),
+      ...(isSiteBuild
+        ? [
+            {
+              name: 'sampo-config:copy-sampo-editor-workers',
+              closeBundle() {
+                // sampo-editor's lib build emits Monaco worker files in dist/assets/.
+                // When we bundle the site from the pre-built npm package, Vite does
+                // not re-process those worker URL references, so the files must be
+                // copied into our site output manually.
+                const editorAssets = r('node_modules/sampo-editor/dist/assets')
+                const siteAssets = r('dist-site/assets')
+                if (!fs.existsSync(editorAssets)) return
+                fs.mkdirSync(siteAssets, { recursive: true })
+                for (const f of fs.readdirSync(editorAssets)) {
+                  if (f.endsWith('.js')) {
+                    fs.copyFileSync(path.join(editorAssets, f), path.join(siteAssets, f))
+                  }
+                }
+              },
+            },
+          ]
+        : []),
       ...(isLibBuild
         ? [
             dts({
